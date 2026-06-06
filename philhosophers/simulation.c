@@ -15,15 +15,6 @@ static void	init_meal_times(t_table *table)
 	}
 }
 
-static void	*philo_routine(void *arg)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)arg;
-	safe_print(philo, "is thinking");
-	return (NULL);
-}
-
 static int	create_threads(t_table *table)
 {
 	int	i;
@@ -35,6 +26,11 @@ static int	create_threads(t_table *table)
 				philo_routine, &table->philo[i]) != 0)
 			return (0);
 		i++;
+	}
+	if (table->n_philo > 1)
+	{
+		if (pthread_create(&table->monitor, NULL, monitor_routine, table) != 0)
+			return (0);
 	}
 	return (1);
 }
@@ -49,6 +45,8 @@ static void	join_threads(t_table *table)
 		pthread_join(table->philo[i].thread, NULL);
 		i++;
 	}
+	if (table->n_philo > 1)
+		pthread_join(table->monitor, NULL);
 }
 
 int	start_simulation(t_table *table)

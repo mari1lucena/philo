@@ -33,6 +33,7 @@ struct s_table
 	int				must_eat;
 	int				stop_now;
 	long			start_time;
+	pthread_t		monitor;
 	t_philo			*philo;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_mutex;
@@ -66,5 +67,8 @@ int		start_simulation(t_table *table);
 
 /* routine.c */
 void	*philo_routine(void *arg);
+
+/* monitor.c */
+void	*monitor_routine(void *arg);
 
 #endif
