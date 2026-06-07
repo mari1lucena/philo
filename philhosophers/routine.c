@@ -6,31 +6,39 @@
 /*   By: marilins <marilins@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 16:26:20 by marilins          #+#    #+#             */
-/*   Updated: 2026/06/05 10:48:12 by marilins         ###   ########.fr       */
+/*   Updated: 2026/06/06 15:59:34 by marilins         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static void	take_forks(t_philo *philo)
+static int	take_forks(t_philo *philo)
 {
 	t_table	*table;
+	int		first;
+	int		second;
 
 	table = philo->table;
+	first = philo->left_fork;
+	second = philo->right_fork;
 	if (philo->id % 2 == 0)
 	{
-		pthread_mutex_lock(&table->forks[philo->right_fork]);
-		safe_print(philo, "has taken a fork");
-		pthread_mutex_lock(&table->forks[philo->left_fork]);
-		safe_print(philo, "has taken a fork");
+		first = philo->right_fork;
+		second = philo->left_fork;
 	}
-	else
+	pthread_mutex_lock(&table->forks[first]);
+	if (is_stopped(table))
+		return (pthread_mutex_unlock(&table->forks[first]), 0);
+	safe_print(philo, "has taken a fork");
+	pthread_mutex_lock(&table->forks[second]);
+	if (is_stopped(table))
 	{
-		pthread_mutex_lock(&table->forks[philo->left_fork]);
-		safe_print(philo, "has taken a fork");
-		pthread_mutex_lock(&table->forks[philo->right_fork]);
-		safe_print(philo, "has taken a fork");
+		pthread_mutex_unlock(&table->forks[second]);
+		pthread_mutex_unlock(&table->forks[first]);
+		return (0);
 	}
+	safe_print(philo, "has taken a fork");
+	return (1);
 }
 
 static void	drop_forks(t_philo *philo)
@@ -83,19 +91,19 @@ void	*philo_routine(void *arg)
 	if (table->n_philo == 1)
 		return (one_philo(philo), NULL);
 	if (philo->id % 2 == 0)
-		usleep(1000);
+		smart_sleep(table, table->time_to_eat / 2);
 	while (!is_stopped(table))
 	{
-		take_forks(philo);
-		if (eat(philo))
-		{
-			drop_forks(philo);
+		if (!take_forks(philo))
 			break ;
-		}
+		if (eat(philo))
+			return (drop_forks(philo), NULL);
 		drop_forks(philo);
 		safe_print(philo, "is sleeping");
 		smart_sleep(table, table->time_to_sleep);
 		safe_print(philo, "is thinking");
+		if (table->n_philo % 2 != 0)
+			smart_sleep(table, table->time_to_eat / 2);
 	}
 	return (NULL);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marilins <marilins@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/06/07 14:20:58 by marilins          #+#    #+#             */
+/*   Updated: 2026/06/07 14:57:21 by marilins         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
@@ -42,12 +54,12 @@ struct s_table
 	int				philos_ready;
 	int				print_ready;
 	int				stop_ready;
+	int				threads_ready;
+	int				monitor_ready;
 };
 
-
-
 //parsing.c
-int	parse_args(int argc, char **argv, t_table *table);
+int		parse_args(int argc, char **argv, t_table *table);
 
 //initi.c
 int		init_table(t_table *table);

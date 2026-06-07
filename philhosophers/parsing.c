@@ -6,17 +6,25 @@
 /*   By: marilins <marilins@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/29 16:49:57 by marilins          #+#    #+#             */
-/*   Updated: 2026/06/04 02:30:35 by marilins         ###   ########.fr       */
+/*   Updated: 2026/06/07 14:21:53 by marilins         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-#include "philosophers.h"
-
-static int	is_digit(char c)
+static void	init_defaults(t_table *table)
 {
-	return (c >= '0' && c <= '9');
+	table->has_optional = 0;
+	table->must_eat = -1;
+	table->stop_now = 0;
+	table->philo = NULL;
+	table->forks = NULL;
+	table->forks_ready = 0;
+	table->philos_ready = 0;
+	table->print_ready = 0;
+	table->stop_ready = 0;
+	table->threads_ready = 0;
+	table->monitor_ready = 0;
 }
 
 static int	is_number(char *str)
@@ -32,7 +40,7 @@ static int	is_number(char *str)
 		return (0);
 	while (str[i])
 	{
-		if (!is_digit(str[i]))
+		if (str[i] < '0' || str[i] > '9')
 			return (0);
 		i++;
 	}
@@ -86,15 +94,7 @@ int	parse_args(int argc, char **argv, t_table *table)
 
 	if (argc != 5 && argc != 6)
 		return (0);
-	table->has_optional = 0; // por padrao não ha arg opcional
-	table->must_eat = -1; //como não há opcional não há numero min. de ref.
-	table->stop_now = 0; // por padrao nao para imediatamente
-	table->philo = NULL; //free NULL é seguro
-	table->forks = NULL;
-	table->forks_ready = 0;
-	table->philos_ready = 0;
-	table->print_ready = 0;
-	table->stop_ready = 0;
+	init_defaults(table);
 	if (!parse_required(argv, table))
 		return (0);
 	if (argc == 6)
@@ -108,4 +108,3 @@ int	parse_args(int argc, char **argv, t_table *table)
 	}
 	return (1);
 }
-
